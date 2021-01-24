@@ -17,20 +17,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .headers().frameOptions().disable()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/oauth/authorize").permitAll()
-                .antMatchers("/oauth/**", "/oauth2/callback").permitAll()
+                    .antMatchers("/oauth/authorize").permitAll()
+                    .antMatchers("/oauth/**", "/oauth2/callback").permitAll()
+                    //.antMatchers("/api/**").access("hasRole('USER')")   //Resource Server 설정이 아니라 여기서 설정하면, 토큰과 관계없이 로그인만 거치면 자원에 접근 가능
+                    //.anyRequest().authenticated()
                 .and()
                 .formLogin().and()
                 .httpBasic();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser("user")
-                .password("{noop}pass")
-                .roles("USER");
-    }
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.inMemoryAuthentication()
+//                .withUser("user")
+//                .password("{noop}pass")
+//                .roles("USER");
+//    }
 
 
 }

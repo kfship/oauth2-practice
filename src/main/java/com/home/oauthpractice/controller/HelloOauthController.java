@@ -5,24 +5,35 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.security.Principal;
+
 
 @RestController
+@Slf4j
 public class HelloOauthController {
 
     @GetMapping("/api/hello")
     public String helloMethod() {
         return "Hello Oauth2!!";
+    }
+
+    @GetMapping("/api/me")
+    public String apiMe(Principal principal) {
+        log.info("principal = " + principal);
+        if(principal == null) {
+            return "principal is null";
+        }
+        return principal.getName();
     }
 
     private RestTemplate restTemplate;
