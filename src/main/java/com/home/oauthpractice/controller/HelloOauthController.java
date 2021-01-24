@@ -22,9 +22,18 @@ import java.security.Principal;
 @Slf4j
 public class HelloOauthController {
 
-    @GetMapping("/api/hello")
-    public String helloMethod() {
+    @GetMapping("/test/call")
+    public String testCall() {
         return "Hello Oauth2!!";
+    }
+
+    @GetMapping("/api/test")
+    public String apiTest(Principal principal) {
+        log.info("principal = " + principal);
+        if (principal == null) {
+            return "principal is null";
+        }
+        return principal.getName();
     }
 
     @GetMapping("/api/me")

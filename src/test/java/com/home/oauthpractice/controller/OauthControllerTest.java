@@ -46,11 +46,12 @@ public class OauthControllerTest {
         String credentials = clientId+":"+secret;
         String encodedCredentials = new String(Base64.encode(credentials.getBytes()));
 
-        UserInfo userInfo = new UserInfo();
+        String username = "user";
+        String password = "pass";
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("username", userInfo.getUsername());
-        params.add("password", userInfo.getPassword());
+        params.add("username", username);
+        params.add("password", password);
         params.add("grant_type", "password");
 
         MvcResult mvcResult = mockMvc.perform(post("/oauth/token")
@@ -82,7 +83,7 @@ public class OauthControllerTest {
         String responseString = mvcResultApi.getResponse().getContentAsString();
 
         Assertions.assertThat(mvcResultApi.getResponse().getStatus()).isEqualTo(200);
-        Assertions.assertThat(responseString).isEqualTo(userInfo.getUsername());
+        Assertions.assertThat(responseString).isEqualTo(username);
     }
 
 
@@ -101,8 +102,8 @@ public class OauthControllerTest {
 
         Assertions.assertThat(mvcResult.getResponse().getStatus())
                 .isEqualTo(401);
-        Assertions.assertThat(mvcResult.getResponse().getErrorMessage())
-                .contains("Unauthorized");
+        Assertions.assertThat(mvcResult.getResponse().getContentAsString())
+                .contains("unauthorized");
     }
 
 

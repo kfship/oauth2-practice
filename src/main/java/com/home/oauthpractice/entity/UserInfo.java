@@ -1,26 +1,37 @@
 package com.home.oauthpractice.entity;
 
 import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Transient;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
-public class UserInfo {
+@Setter
+@ToString
+@Entity
+public class UserInfo implements UserDetails {
 
-    private String username = "user";
-    private String password = "pass";
-    private List<String> roles = new ArrayList<>();
+    private static final long serialVersionUID = -4608347932140057654L;
 
-    public UserInfo() {
-        roles.add("ROLE_USER");
-    }
+    @Id
+    private String username;
+    private String password;
+    private String userrole;
 
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-    }
+    @Transient
+    private Collection<? extends GrantedAuthority> authorities;
+    @Transient
+    private boolean accountNonExpired = true;
+    @Transient
+    private boolean accountNonLocked = true;
+    @Transient
+    private boolean credentialsNonExpired = true;
+    @Transient
+    private boolean enabled = true;
 }

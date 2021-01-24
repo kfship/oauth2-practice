@@ -47,3 +47,10 @@ create table oauth_approvals (
 create table oauth_code (
   code VARCHAR(256), authentication blob
 );
+
+create table user_info (
+  username varchar(50) not null,
+  password varchar(255),
+  userrole varchar(50),
+primary key (username)
+);

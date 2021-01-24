@@ -1,24 +1,32 @@
 package com.home.oauthpractice.security;
 
 import com.home.oauthpractice.entity.UserInfo;
+import com.home.oauthpractice.repository.UserInfoRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+
+import static com.home.oauthpractice.security.AuthoritiesUtils.createAuthorities;
 
 @Configuration
 @RequiredArgsConstructor
 public class CustomAuthenticationProvider implements AuthenticationProvider {
+
+    @Autowired
+    private UserInfoRepository userInfoRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -28,45 +36,26 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         System.out.println("authentication.username = " + username);
         System.out.println("authentication.password = " + password);
 
-
-        //checkLogin(username, password);
-        //Collection<? extends GrantedAuthority> authorities = getAuthorities();
-
-
-        // 테스트 유저 호출(만약 DB에 연동해서 불러온다면 대체해도 된다)
-        UserInfo userInfo = new UserInfo();
-
-        if(password.equals(userInfo.getPassword()) == false) {
-            throw new BadCredentialsException(username);
+        UserInfo userInfo = null;
+        if(!StringUtils.isEmpty(username)) {
+            userInfo = userInfoRepository.findByUsername(username);
         }
-        return new UsernamePasswordAuthenticationToken(username, password, userInfo.getAuthorities());
+
+        if(ObjectUtils.isEmpty(userInfo)) {
+            throw new UsernameNotFoundException("Invalid username");
+        }
+
+        String userPassword = userInfo.getPassword();
+        System.out.println("사용자 패스워드 = " + userPassword + " 입력된 패스워드 = " + password);
+        if(!StringUtils.equals(password, passwordEncoder.encode(String.valueOf(password)))) {
+            throw new BadCredentialsException("Invalid password");
+        }
+
+        return new UsernamePasswordAuthenticationToken(userInfo, password, createAuthorities(userInfo));
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
         return authentication.equals(UsernamePasswordAuthenticationToken.class);
-    }
-
-    /**
-     * 권한 추가
-     */
-    private Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
-        grantedAuthorityList.add(new SimpleGrantedAuthority("ROLE_USER"));
-
-        return grantedAuthorityList;
-    }
-
-
-    private void checkLogin(String username, String password) {
-
-        BCryptPasswordEncoder BCryptImpl = new BCryptPasswordEncoder();
-
-        if(username.equals("test") ) {
-            throw new BadCredentialsException("아이디 또는 패스워드가 틀립니다");
-        }
-        if(BCryptImpl.matches(password, "$2a$10$Ihw2gtO0/XSpdJftWFkjlePlCM6HoIhg44iwdc3vUUMn3EnJ3OgES")) {
-            throw new BadCredentialsException("아이디 또는 패스워드가 다릅니다");
-        }
     }
 }

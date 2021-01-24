@@ -46,6 +46,8 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 
+        clients.jdbc(dataSource);
+        /*
         clients.inMemory()
                 .withClient("testClientId")
                 .secret("{noop}testSecret")
@@ -53,11 +55,12 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
                 .authorizedGrantTypes("authorization_code", "password", "refresh_token")
                 .scopes("read", "write")
         ;
+        */
     }
 
-//    **************************************************************************************************************
-//    스프링 시큐리티의 설정과 중복되기 때문에 여기서는 아무것도 할 필요가 없는게 아닌가...
-//    **************************************************************************************************************
+    //**************************************************************************************************************
+    //스프링 시큐리티의 설정과 중복되기 때문에 여기서는 아무것도 할 필요가 없는게 아닌가...
+    //**************************************************************************************************************
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         // 토큰유효성(/token/check_token) 접근을 위해 설정
